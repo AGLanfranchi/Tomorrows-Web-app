@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>index</title>
+</head>
+
+<body>
+    <h1>WebSocket Test</h1>
+
+    <div id="output">
+        <p style="overflow-wrap: break-word;">CONNECTED</p>
+    </div>
+
+    <h2>Enter a post</h2>
+
+    <form id="postsForm" name="postsForm" action="" method="post">
+        <input id="message" type="text" name="message" placeholder="Write your post" required>
+        <input id="roomID" type="text" name="roomID" placeholder="Enter room ID" required>
+        <input id="postsFormSubmit" type="submit" value="Post" />
+    </form>
+
+    <script language="javascript" type="text/javascript">
+        var wsUri = "ws://138.68.128.130:8181/";
+        var output;
+
+        function init() {
+            output = document.getElementById("output");
+            initWebSocket();
+        }
+
+        function initWebSocket() {
+            websocket = new WebSocket(wsUri);
+            websocket.onopen = onOpen;
+            websocket.onclose = onClose;
+            websocket.onmessage = onMessage;
+            websocket.onerror = onError;
+        }
+
+        function onOpen(evt) {
+            writeToScreen("CONNECTED");
+            websocket.send("Hello")
+
+        }
+
+        function onClose(evt) {
+            writeToScreen("DISCONNECTED");
+        }
+
+        function onMessage(evt) {
+            writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data + '</span>');
+            JSON
+        }
+
+        function onError(evt) {
+            writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+        }
+
+        function doSend(message) {
+            writeToScreen("SENT: " + message);
+            websocket.send(message);
+        }
+
+        function writeToScreen(message) {
+            var pre = document.createElement("p");
+            pre.style.wordWrap = "break-word";
+            // pre.innerText = message; this is the correct version to use but messes out the screen
+            pre.innerHTML = message;
+            output.appendChild(pre);
+        }
+
+
+
+        let form = document.getElementById("postsForm");
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            let data = new FormData(form);
+
+            console.log(
+                event,
+                form,
+                data.get('message')
+            )
+
+            doSend(data.get('message'))
+
+        })
+
+
+        window.addEventListener("load", init, false);
+    </script>
+
+
+</body>
+
+</html>
